@@ -47,7 +47,7 @@ class SearchResults extends Component<Props, State> {
     return (
       <>
         {load ? <div className="loading">Loading....</div> : null}
-        <div className="chatacters-list">
+        <div className="characters-list">
           {characterData !== null ? (
             characterData.length ? (
               characterData.map((character: ICharacter) => (
