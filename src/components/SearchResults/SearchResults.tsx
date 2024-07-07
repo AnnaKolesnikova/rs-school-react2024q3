@@ -1,6 +1,6 @@
 import { Component } from "react";
 import "./SearchResults.scss";
-import LoadData from "../../api/dataLoader";
+import DataLoader from "../../api/dataLoader";
 import { IAppProps, ICharacter } from "../../types/types";
 import NotFound from "../NotFound/NotFound";
 import CharacterCard from "../CharacterCard/CharacterCard";
@@ -13,7 +13,7 @@ interface State {
 }
 
 class SearchResults extends Component<Props, State> {
-  load = new LoadData();
+  load = new DataLoader();
   state: State = {
     characterData: null,
     load: true,
@@ -52,7 +52,7 @@ class SearchResults extends Component<Props, State> {
             characterData.length ? (
               characterData.map((character: ICharacter) => (
                 <CharacterCard
-                  key={character.name}
+                  key={character.id}
                   {...character}
                 ></CharacterCard>
               ))
