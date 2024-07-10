@@ -1,69 +1,101 @@
-import { Component } from "react";
+import { useEffect, useState } from "react";
 import "./SearchResults.scss";
-import DataLoader from "../../api/dataLoader";
-import { IAppProps, ICharacter } from "../../types/types";
+import { getData } from "../../api/dataLoader";
+import { ICharacter } from "../../types/types";
 import NotFound from "../NotFound/NotFound";
 import CharacterCard from "../CharacterCard/CharacterCard";
 
-type Props = Pick<IAppProps, "searchTerm">;
-
-interface State {
-  characterData: ICharacter[] | null;
-  load: boolean;
+interface Props {
+  searchWord: string;
 }
 
-class SearchResults extends Component<Props, State> {
-  load = new DataLoader();
-  state: State = {
-    characterData: null,
-    load: true,
-  };
+export default function SearchResults({ searchWord }: Props) {
+  const [itemData, setItemData] = useState<ICharacter[] | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  componentDidMount() {
-    this.loadData(this.props.searchTerm);
-  }
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+  const lastIndex = currentPage * itemsPerPage;
+  const firstIndex = lastIndex - itemsPerPage;
+  const records = itemData?.slice(firstIndex, lastIndex);
+  const npage = Math.ceil(itemData ? itemData.length / itemsPerPage : 1);
+  const numbers = [...Array(npage + 1).keys()].slice(1);
 
-  componentDidUpdate(prevProps: Props): void {
-    if (this.props.searchTerm !== prevProps.searchTerm) {
-      this.setState({ load: true });
-      this.loadData(this.props.searchTerm);
-    }
-  }
+  useEffect(() => {
+    loadData(searchWord);
+    return () => setLoading(true);
+  }, [searchWord]);
 
-  async loadData(searchTerm: string) {
+  const loadData = async (searchWord: string) => {
     try {
-      const data = await this.load.getData(searchTerm);
+      const data = await getData(searchWord);
       setTimeout(() => {
-        this.setState({ characterData: data, load: false });
+        setItemData(data);
+        setLoading(false);
       }, 200);
     } catch (err) {
       console.log(err);
     }
+  };
+
+  function prevPage() {
+    if (currentPage !== 1) {
+      setCurrentPage(currentPage - 1);
+    }
   }
 
-  render() {
-    const { characterData, load } = this.state;
-
-    return (
-      <>
-        {load ? <div className="loading">Loading....</div> : null}
-        <div className="characters-list">
-          {characterData !== null ? (
-            characterData.length ? (
-              characterData.map((character: ICharacter) => (
-                <CharacterCard
-                  key={character.id}
-                  {...character}
-                ></CharacterCard>
-              ))
-            ) : (
-              <NotFound></NotFound>
-            )
-          ) : null}
-        </div>
-      </>
-    );
+  function changeCurrentPage(id: number) {
+    setCurrentPage(id);
   }
+
+  function nextPage() {
+    if (currentPage !== npage) {
+      setCurrentPage(currentPage + 1);
+    }
+  }
+
+  return (
+    <>
+      {loading ? <div className="loading">Loading....</div> : null}
+      <nav>
+        <ul className="pagination">
+          <li className="page-item">
+            <a href="#" className="page-link" onClick={prevPage}>
+              Prev.
+            </a>
+          </li>
+          {numbers.map((n, i) => (
+            <li
+              className={`page-item ${currentPage === n ? "active" : ""}`}
+              key={i}
+            >
+              <a
+                href="#"
+                className="page-link"
+                onClick={() => changeCurrentPage(n)}
+              >
+                {n}
+              </a>
+            </li>
+          ))}
+          <li className="page-item">
+            <a href="#" className="page-link" onClick={nextPage}>
+              Next
+            </a>
+          </li>
+        </ul>
+      </nav>
+      <div className="characters-list">
+        {records !== null ? (
+          records?.length ? (
+            records?.map((character: ICharacter) => (
+              <CharacterCard key={character.id} {...character}></CharacterCard>
+            ))
+          ) : (
+            <NotFound></NotFound>
+          )
+        ) : null}
+      </div>
+    </>
+  );
 }
-
-export default SearchResults;

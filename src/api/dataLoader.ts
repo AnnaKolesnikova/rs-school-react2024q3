@@ -1,30 +1,34 @@
 import { ICharacter } from "../types/types";
 
-class LoadData {
-  API_URL = "https://rickandmortyapi.com/api/character";
+const API_URL = "https://rickandmortyapi.com/api/character";
 
-  getData(searchTerm = ""): Promise<ICharacter[]> {
-    return searchTerm ? this.getDataBySearch(searchTerm) : this.getAllData();
-  }
+const getDataBySearch = (
+  searchWord: string,
+  page = 1,
+): Promise<ICharacter[]> => {
+  return fetch(`${API_URL}/?page=${page}&search=${searchWord}`)
+    .then((response) => (response.status === 200 ? response.json() : null))
+    .then((data) => (data?.results ? data.results : []));
+};
 
-  private getDataBySearch(searchTerm: string): Promise<ICharacter[]> {
-    return fetch(`${this.API_URL}/?search=${searchTerm}`)
-      .then((response) => (response.status === 200 ? response.json() : null))
-      .then((data) => (data?.results ? data.results : []));
-  }
+const getAllItems = async (): Promise<ICharacter[]> => {
+  let allItems: ICharacter[] = [];
+  let page = 1;
+  let totalPages = 1;
 
-  async getAllData(): Promise<ICharacter[]> {
-    let allCharacters: ICharacter[] = [];
-
-    const response = await fetch(this.API_URL);
+  while (page <= totalPages) {
+    const response = await fetch(`${API_URL}/?page=${page}`);
     const data = await response.json();
 
     if (data && data.results) {
-      allCharacters = [...allCharacters, ...data.results];
+      allItems = [...allItems, ...data.results];
+      totalPages = 5;
     }
-
-    return allCharacters;
+    page++;
   }
-}
+  return allItems;
+};
 
-export default LoadData;
+export const getData = (searchWord = "", page = 1): Promise<ICharacter[]> => {
+  return searchWord ? getDataBySearch(searchWord, page) : getAllItems();
+};
