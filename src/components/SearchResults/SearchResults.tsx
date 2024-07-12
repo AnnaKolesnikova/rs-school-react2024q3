@@ -10,15 +10,17 @@ interface Props {
 }
 
 export default function SearchResults({ searchWord }: Props) {
-  const [itemData, setItemData] = useState<ICharacter[] | null>(null);
+  const [characterData, setCharacterData] = useState<ICharacter[] | null>(null);
   const [loading, setLoading] = useState(true);
 
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
-  const lastIndex = currentPage * itemsPerPage;
-  const firstIndex = lastIndex - itemsPerPage;
-  const records = itemData?.slice(firstIndex, lastIndex);
-  const npage = Math.ceil(itemData ? itemData.length / itemsPerPage : 1);
+  const charactersPerPage = 10;
+  const lastIndex = currentPage * charactersPerPage;
+  const firstIndex = lastIndex - charactersPerPage;
+  const records = characterData?.slice(firstIndex, lastIndex);
+  const npage = Math.ceil(
+    characterData ? characterData.length / charactersPerPage : 1,
+  );
   const numbers = [...Array(npage + 1).keys()].slice(1);
 
   useEffect(() => {
@@ -30,7 +32,7 @@ export default function SearchResults({ searchWord }: Props) {
     try {
       const data = await getData(searchWord);
       setTimeout(() => {
-        setItemData(data);
+        setCharacterData(data);
         setLoading(false);
       }, 200);
     } catch (err) {

@@ -5,12 +5,12 @@ export interface IProps {
 }
 
 export interface IAppProps extends IProps {
-    searchTerm: string;
-    updateSearchTerm: (value: string) => void;
-  }
+  searchWord: string;
+  updateSearchWord: (value: string) => void;
+}
 
 export interface IResponse {
-  results: CharacterData[];
+  results: ICharacter[];
   pages: number;
 }
 
