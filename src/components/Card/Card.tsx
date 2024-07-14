@@ -1,7 +1,7 @@
 import { ICharacter } from "../../types/types";
-import "./CharacterCard.scss";
+import "./Card.scss";
 
-export default function CharacterCard({ name, image }: ICharacter) {
+export default function Card({ name, image }: ICharacter) {
   return (
     <div className="character-card" data-testid="character-card">
       <h5 className="character-name">{name}</h5>

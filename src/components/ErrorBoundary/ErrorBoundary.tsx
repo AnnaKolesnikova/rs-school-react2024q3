@@ -6,7 +6,7 @@ interface State {
   hasError: boolean;
 }
 
-class ErrorBoundary extends Component<IProps, State> {
+export default class ErrorBoundary extends Component<IProps, State> {
   state: State = { hasError: false };
 
   render() {
@@ -17,5 +17,3 @@ class ErrorBoundary extends Component<IProps, State> {
     return this.props.children;
   }
 }
-
-export default ErrorBoundary;
